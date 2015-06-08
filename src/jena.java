@@ -23,10 +23,12 @@ public class jena {
 		
 		Resource rodzicMama = rodzina.createResource(link + "rodzicMama");
 		Resource rodzicTata = rodzina.createResource(link + "rodzicTata");
+		Resource brat = rodzina.createResource(link + "brat");
 		
 		Property wiek = rodzina.createProperty(link + "wiek");
 		
 		rodzicMama.addProperty(wiek, "50");
+		brat.addProperty(wiek, "34");
 		rodzicTata.addProperty(wiek, "55");
 		rodzicMama.addProperty(VCARD.FN, "Irena", XSDDatatype.XSDstring);
 		rodzicMama.addProperty(VCARD.NICKNAME, "mama").

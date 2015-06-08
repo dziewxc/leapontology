@@ -8,10 +8,15 @@ import java.nio.file.Paths;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Selector;
+import com.hp.hpl.jena.rdf.model.SimpleSelector;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.leapmotion.leap.Controller;
 import com.leapmotion.leap.Frame;
 import com.leapmotion.leap.Gesture;
@@ -32,22 +37,35 @@ class LeapListener extends Listener {
 	
 	public void onFrame(Controller controller) {
 		Frame frame = controller.frame();
-		String link = "http://leapmotion.com/test/";
+		OntModel ontology = Ontology.main(null);
 		
-		OntModel ontology = OntologyController.ontology;
-		//ontology.write(System.out, "Turtle");
-		Resource Reka = ontology.createResource(link + "reka");   //tworze arbitralna abstrakcyjna reke
-		//Reka ma typ Hand
+		Resource Reka = ontology.createResource(Ontology.link + "reka");
+		OntProperty iloscRak = ontology.getOntProperty(Ontology.link + "iloscRak");
+		
+		Integer ilosc = frame.hands().count();
+		Reka.addProperty(iloscRak, ilosc.toString());
 
-		//ontology.add(resource, property, RDFNode);
+		//ontology.write(System.out, "Turtle");
 		
-		System.out.println("Frame Id:" + frame.id()
+		 Selector selector = new SimpleSelector(Reka, null, 1);
+		 StmtIterator iter3 = ontology.listStatements(selector);
+		 
+		 while(iter3.hasNext())
+		 {
+			 com.hp.hpl.jena.rdf.model.Statement stmt = iter3.nextStatement();
+			 //System.out.print("    subject:     " + stmt.getSubject().toString());
+			 //System.out.print("    predykat:     " + stmt.getPredicate().toString());
+			 //System.out.println("    object:     " + stmt.getObject().toString());
+			 System.out.println("Super, rêka!");
+		 }
+		
+		/*System.out.println("Frame Id:" + frame.id()
 				+ ", Timestamp " + frame.timestamp()
 				+ ", Hands " + frame.hands().count()
 				+ ", Fingers " + frame.fingers().count()
 				+ ", Tools " + frame.tools().count()
 				+ ", Gestures " + frame.gestures().count()
-				);
+				);*/
 	}
 	
 	public void onDisconnect(Controller controller) {
@@ -63,6 +81,8 @@ class LeapListener extends Listener {
 class LeapController {
 	
 	public void main(String[] args) {
+		OntModel ontology = Ontology.main(args);
+		
 		LeapListener listener = new LeapListener();	  //tworzymy listener - obserwuje zmiany w urz¹dzeniu
 		Controller controller = new Controller();    //tworzymy controller
 		
@@ -82,15 +102,12 @@ class LeapController {
 }
 
 public class OntologyController {
-	static OntModel ontology;
 	
 	public static void main(String[] args) {
-		OntologyController.ontology = Ontology.main(args);
-		
-		ontology.write(System.out, "Turtle");
-		
+		//OntModel ontology = Ontology.main(args);
 		LeapController leapcontroller = new LeapController();
-		//leapcontroller.main(args);
+		//ontology.createResource("ddsfd");
+		leapcontroller.main(args);
 	}
 }
 
@@ -99,10 +116,10 @@ class Ontology {
 	static String link = "http://leapmotion.com/test/";
 	
 	public static OntModel main(String[] args) {
-		OntModel ontology = ModelFactory.createOntologyModel();
+		ontology = ModelFactory.createOntologyModel();
 		java.nio.file.Path input = Paths.get("C:/Users/Ziemniak/Desktop/praca magisterska1/Ontologies", "Ontology1426332736376.owl");
 		ontology.read(input.toUri().toString(), "RDF/XML");
-		
+		ontology.createResource("ddsfd");
 		OntClass Person = ontology.createClass( link + "Person" );
 		Person.setLabel( "person", "en" );
 		

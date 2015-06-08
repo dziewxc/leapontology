@@ -17,6 +17,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.VCARD;
 import com.hp.hpl.jena.vocabulary.XSD;
 import com.hp.hpl.jena.ontology.ObjectProperty;
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -37,6 +38,12 @@ public class sparql {
 		Model leap = ModelFactory.createDefaultModel();
 		java.nio.file.Path input = Paths.get("C:/Users/Ziemniak/Desktop/praca magisterska1/Ontologies", "vc-db-1.rdf");
 		leap.read(input.toUri().toString(), "RDF/XML");
+		
+		OntModel ontology = ModelFactory.createOntologyModel();
+		input = Paths.get("C:/Users/Ziemniak/Desktop/praca magisterska1/Ontologies", "Ontology1426332736376.owl");
+		ontology.read(input.toUri().toString(), "RDF/XML");
+		
+		ontology.createResource("jdshfj");
 		
 		String NS = "urn:x-hp-jena:eg/";
 		Property p = leap.createProperty(NS, "ilosc lap");
