@@ -53,8 +53,14 @@ public class sparql {
 		//p.addRange();
 		leap.createResource(NS+"a").addProperty(p, "4");
 		
-		//walidacja
 		InfModel inf = ModelFactory.createRDFSModel(leap);
+		
+		Resource a = inf.getResource(NS+"a");
+		System.out.println("Statement: " + a.getProperty(q));
+		
+		leap.write(System.out, "Turtle");
+		
+		//walidacja
 		
 		ValidityReport validity = inf.validate();
 		if (validity.isValid()) {
@@ -65,11 +71,6 @@ public class sparql {
 		        System.out.println(" - " + i.next());
 		    }
 		}
-		
-		Resource a = inf.getResource(NS+"a");
-		System.out.println("Statement: " + a.getProperty(q));
-		
-		leap.write(System.out, "Turtle");
 		
 		String queryString =
 				"SELECT ?x " +

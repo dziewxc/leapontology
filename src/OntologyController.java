@@ -9,6 +9,7 @@ import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.rdf.model.InfModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -17,6 +18,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Selector;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import com.leapmotion.leap.Controller;
 import com.leapmotion.leap.Frame;
 import com.leapmotion.leap.Gesture;
@@ -40,23 +42,43 @@ class LeapListener extends Listener {
 		OntModel ontology = Ontology.main(null);
 		
 		Resource Reka = ontology.createResource(Ontology.link + "reka");
-		OntProperty iloscRak = ontology.getOntProperty(Ontology.link + "iloscRak");
 		
 		Integer ilosc = frame.hands().count();
-		Reka.addProperty(iloscRak, ilosc.toString());
-
-		//ontology.write(System.out, "Turtle");
+		
+		
+		OntProperty iloscDloni = ontology.getOntProperty(Ontology.link + "iloscDloni");
+		OntProperty iloscRak = ontology.createOntProperty(Ontology.link + "iloscRak");
+		ontology.add(iloscDloni, RDFS.subPropertyOf, iloscRak);
+		
+		Reka.addProperty(iloscDloni, ilosc.toString());
+		
+		InfModel inf = ModelFactory.createRDFSModel(ontology);
+		Resource InfReka = inf.getResource(Ontology.link + "reka");
 		
 		 Selector selector = new SimpleSelector(Reka, null, 1);
-		 StmtIterator iter3 = ontology.listStatements(selector);
+		 StmtIterator iter = ontology.listStatements(selector);
 		 
-		 while(iter3.hasNext())
+		 while(iter.hasNext())
 		 {
-			 com.hp.hpl.jena.rdf.model.Statement stmt = iter3.nextStatement();
+			 com.hp.hpl.jena.rdf.model.Statement stmt = iter.nextStatement();
 			 //System.out.print("    subject:     " + stmt.getSubject().toString());
 			 //System.out.print("    predykat:     " + stmt.getPredicate().toString());
-			 //System.out.println("    object:     " + stmt.getObject().toString());
-			 System.out.println("Super, rêka!");
+			 System.out.print("    iloœæ d³oni:     " + stmt.getObject().toString());
+			 System.out.print("    Iloœæ r¹k: " + (InfReka.getProperty(iloscRak)).getObject().toString());
+			 System.out.println("    Super, rêka!");
+		 }
+		 
+		 Selector selector2 = new SimpleSelector(Reka, null, 2);
+		 StmtIterator iter2 = ontology.listStatements(selector2);
+		 
+		 while(iter2.hasNext())
+		 {
+			 com.hp.hpl.jena.rdf.model.Statement stmt = iter2.nextStatement();
+			 //System.out.print("    subject:     " + stmt.getSubject().toString());
+			 //System.out.print("    predykat:     " + stmt.getPredicate().toString());
+			 System.out.print("    iloœæ d³oni:     " + stmt.getObject().toString());
+			 System.out.print("      Iloœæ r¹k: " + (InfReka.getProperty(iloscRak)).getObject().toString());
+			 System.out.println("    WOW WSZYSTKIE RÊCE");
 		 }
 		
 		/*System.out.println("Frame Id:" + frame.id()
@@ -104,9 +126,7 @@ class LeapController {
 public class OntologyController {
 	
 	public static void main(String[] args) {
-		//OntModel ontology = Ontology.main(args);
 		LeapController leapcontroller = new LeapController();
-		//ontology.createResource("ddsfd");
 		leapcontroller.main(args);
 	}
 }
@@ -119,12 +139,13 @@ class Ontology {
 		ontology = ModelFactory.createOntologyModel();
 		java.nio.file.Path input = Paths.get("C:/Users/Ziemniak/Desktop/praca magisterska1/Ontologies", "Ontology1426332736376.owl");
 		ontology.read(input.toUri().toString(), "RDF/XML");
-		ontology.createResource("ddsfd");
+		
+		//ontology.write(System.out, "Turtle");
 		OntClass Person = ontology.createClass( link + "Person" );
 		Person.setLabel( "person", "en" );
 		
-		ObjectProperty iloscRak = ontology.createObjectProperty(link + "iloscRak");
-	    iloscRak.setDomain(Person);
+		ObjectProperty iloscDloni = ontology.createObjectProperty(link + "iloscDloni");
+	    iloscDloni.setDomain(Person);
 		
 		OntClass Palec = ontology.createClass( link + "Palec" );
 		Palec.setLabel( "palec", "en" );
