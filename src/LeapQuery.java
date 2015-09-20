@@ -9,8 +9,10 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Selector;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDFS;
 //import com.hp.hpl.jena.sparql.path.Path;
@@ -30,52 +32,42 @@ import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 
-public class sparql {
+public class LeapQuery {
 
 	public static void main(String[] args) {
+		Model newmodel = ModelFactory.createDefaultModel();
+		String NS = "ns/";
+		Property paw_number = newmodel.createProperty(NS, "ilosc lap");
+		Property limb_number = newmodel.createProperty(NS, "ilosc konczyn");
 		
+		newmodel.add(paw_number, RDFS.subPropertyOf, limb_number);
+		newmodel.createResource(NS + "a").addProperty(paw_number, "4");
 		
-		Model leap = ModelFactory.createDefaultModel(); //create default model
-		java.nio.file.Path input = Paths.get("C:/Users/Ziemniak/Desktop/praca magisterska1/Ontologies", "vc-db-1.rdf"); //download ontology
-		leap.read(input.toUri().toString(), "RDF/XML");  //read ontology
+		InfModel inf = ModelFactory.createRDFSModel(newmodel);
+		Resource Azor = inf.getResource(NS + "a");
+		System.out.println("Statement: " + Azor.getProperty(limb_number));
+		query();
+	}
+	
+	public static void query()
+	{
+		Model leap = ModelFactory.createDefaultModel();
+		java.nio.file.Path input = Paths.get("C:/Users/Ziemniak/Desktop/praca magisterska1/Ontologies", "leapmotion.owl");
+		leap.read(input.toUri().toString(), "RDF/XML");
 		
-		OntModel ontology = ModelFactory.createOntologyModel(); //create ontology model
-		input = Paths.get("C:/Users/Ziemniak/Desktop/praca magisterska1/Ontologies", "Ontology1426332736376.owl");
-		ontology.read(input.toUri().toString(), "RDF/XML");
-		
-		ontology.createResource("jdshfj");
-		
-		String NS = "urn:x-hp-jena:eg/"; //create namespace
-		Property p = leap.createProperty(NS, "ilosc lap");
-		Property q = leap.createProperty(NS, "ilosc konczyn");
-		//ObjectProperty is = leap.createObjectProperty(NS+"is_application_of");
-		leap.add(p, RDFS.subPropertyOf, q);   //ilosc lap jest podwlasciwoscia ilosci konczyn
-		//p.addRange();
-		leap.createResource(NS+"a").addProperty(p, "4");
-		
+		leap.createResource("circlegesture");
 		InfModel inf = ModelFactory.createRDFSModel(leap);
 		
-		Resource a = inf.getResource(NS+"a");
-		System.out.println("Statement: " + a.getProperty(q));
+		Resource gest = inf.getResource("circlegesture");
+		Resource circleGesture = inf.getResource("CircleGesture");
+		Statement s = ResourceFactory.createStatement(gest, "rdf:type", circleGesture);  //
+		leap.add(s);
 		
-		//leap.write(System.out, "Turtle");
-		
-		//walidacja
-		
-		ValidityReport validity = inf.validate();
-		if (validity.isValid()) {
-		    System.out.println("OK");
-		} else {
-		    System.out.println("Conflicts");
-		    for (Iterator i = validity.getReports(); i.hasNext(); ) {  //nie wiem czy dobry typ Iterator
-		        System.out.println(" - " + i.next());
-		    }
-		}
 		
 		String queryString =
 				"SELECT ?x " +
 				"WHERE { " +
-				"?x  <http://www.w3.org/2001/vcard-rdf/3.0#FN>  \"John Smith\" }";
+				"?x  a  \"John Smith\" }";
 		Query query = QueryFactory.create(queryString);
 		QueryExecution qexec = QueryExecutionFactory.create(query, leap);
 		try {
@@ -88,8 +80,12 @@ public class sparql {
 		} finally {
 				qexec.close();
 			}
-
 	}
 }
+
+
+
+
+
 
 

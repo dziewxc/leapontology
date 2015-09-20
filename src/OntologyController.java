@@ -39,9 +39,8 @@ class LeapListener extends Listener {
 	
 	public void onFrame(Controller controller) {
 		Frame frame = controller.frame();
-		OntModel ontology = Ontology.main(null);
-		
-		Resource Reka = ontology.createResource(Ontology.link + "reka");
+		OntModel ontology = Ontology.main(null);  //tworzê nowy model
+		Resource Reka = ontology.createResource(Ontology.link + "reka");  //
 		
 		Integer ilosc = frame.hands().count();
 		
